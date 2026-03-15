@@ -1,0 +1,38 @@
+camera.py
+*mp4
+model.py
+# Virtual environment
+
+crowd_env/
+venv/
+.env/
+# Python cache
+
+**pycache**/
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter checkpoints (if any)
+
+.ipynb_checkpoints/
+
+# OS files
+
+.DS_Store
+Thumbs.db
+
+# Logs
+
+*.log
+
+# Model checkpoints (optional if large)
+
+*.pt
+*.pth
+*.h5
+
+# Temporary files
+
+*.tmp
+*.temp
