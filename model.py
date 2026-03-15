@@ -3,38 +3,26 @@ import numpy as np
 import tensorflow as tf
 import math
 from collections import deque
-import socket
-import threading
+import time
 
 # -----------------------------
-# Network alert server
+# Alert function
 # -----------------------------
-HOST = "0.0.0.0"
-PORT = 5000
+last_alert_time = 0
+ALERT_COOLDOWN = 10  # seconds
 
-clients = []
+def send_notification(message):
+    global last_alert_time
 
-def start_server():
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind((HOST, PORT))
-    server.listen(5)
+    current_time = time.time()
 
-    print("Alert server running...")
+    if current_time - last_alert_time > ALERT_COOLDOWN:
 
-    while True:
-        client, addr = server.accept()
-        print("Device connected:", addr)
-        clients.append(client)
+        print("\n===================================")
+        print("🚨 ALERT:", message)
+        print("===================================\n")
 
-threading.Thread(target=start_server, daemon=True).start()
-
-
-def send_alert(message):
-    for client in clients:
-        try:
-            client.send((message + "\n").encode())
-        except:
-            clients.remove(client)
+        last_alert_time = current_time
 
 
 # -----------------------------
@@ -210,12 +198,6 @@ while True:
             stable_count = 0
 
     # -----------------------------
-    # SEND NETWORK ALERT
-    # -----------------------------
-    if stable_density == 2:
-        send_alert("ALERT: HIGH CROWD DENSITY DETECTED")
-
-    # -----------------------------
     # Trend prediction
     # -----------------------------
     trend = "STABLE"
@@ -230,6 +212,12 @@ while True:
 
         elif start - end > TREND_THRESHOLD:
             trend = "CROWD DISPERSING"
+
+    # -----------------------------
+    # ALERT TRIGGER
+    # -----------------------------
+    if stable_density == 2 and trend == "CROWD FORMING":
+        send_notification("HIGH CROWD DENSITY DETECTED")
 
     # -----------------------------
     # Draw bounding boxes
